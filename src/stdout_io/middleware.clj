@@ -28,7 +28,7 @@
 (defn wrap-reload-in-dev [handler]
   (if (= (conf/cfg :profile) :dev)
     (fn [req]
-      (require :reload 'stdout-io.tmpls) ; reload templates
+      (require :reload 'stdout-io.handlers.api)
       (handler req))
     handler))
 
