@@ -14,8 +14,8 @@
   (GET "/" [] app/show-landing)
   (context "/api" []
            ;; JGET returns json encoding of the response
-           (JGET "/logs/:id" [] api/get-logs-handler)
-           (JPOST "/logs/:id" [] api/write-logs-handler))
+           (GET "/logs/:id" [] api/get-logs-handler)
+           (POST "/logs/:id" [] api/write-logs-handler))
   ;; static files under ./public folder, prefix /static
   ;; like /static/css/style.css
   (route/files "/static")
@@ -23,7 +23,6 @@
   (route/not-found "<p>Page not found.</p>" ))
 
 (defn app [] (-> #'server-routes*
-                 wrap-session
                  wrap-keyword-params
                  wrap-params
                  wrap-request-logging-in-dev
