@@ -1,5 +1,6 @@
 (ns stdout-io.handlers.api
-  (:use org.httpkit.server)
+  (:use org.httpkit.server
+        org.httpkit.timer)
   (:require [taoensso.carmine :as car :refer (wcar)]
             [clojure.data.json :as json]))
 
@@ -30,18 +31,17 @@
   (let [id (-> req :params :id)
         new-lines (get-logs id)]
     (with-channel req channel
-    ;  (if (seq new-lines)
-    ;    (send! channel (json-ok new-lines)))
+      (if (seq new-lines)
+        (send! channel (json-ok new-lines) false))
       (let [listener (wait-for-new-lines
                        id
                        (fn [new-lines]
-                         (println "send " (apply str new-lines) " to " channel)
-                         (send! channel (json-ok new-lines))))]
-
+                         (send! channel (json-ok new-lines) false)))]
         (on-close channel (fn [status]
                             (car/close-listener listener)
-                            (println "channel closed, " status)))
-        ))))
+                            (println "channel closed, " status))))
+      (schedule-task 10000 (close channel))
+      )))
 
 (defn write-logs-handler [req]
   (let [id (-> req :params :id)
