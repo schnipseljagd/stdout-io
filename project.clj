@@ -6,6 +6,9 @@
   :main stdout-io.main
   :aot [stdout-io.main]
   :uberjar-name "stdout-io-standalone.jar"
+  :uberimage {:cmd ["/usr/bin/java" "-jar" "/uberjar.jar"]
+              :instructions ["RUN apt-get update && apt-get -y dist-upgrade"]
+              :tag "schnipseljagd/stdout-io:0.1.0"}
   ;; :plugins [[lein-swank "1.4.4"]]
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.cli "0.2.2"]
