@@ -1,10 +1,13 @@
 (ns stdout-io.handlers.api
-  (:use org.httpkit.server
-        org.httpkit.timer)
+  (:use [org.httpkit.server]
+        [org.httpkit.timer]
+        [stdout-io.config :only [cfg]])
   (:require [taoensso.carmine :as car :refer (wcar)]
             [clojure.data.json :as json]))
 
-(defmacro wcar* [& body] `(car/wcar {:pool {} :spec {}} ~@body))
+(defn redis-server-conn [] {:pool {} :spec {:host (cfg :redis-host) :port (cfg :redis-port)}})
+
+(defmacro wcar* [& body] `(car/wcar (redis-server-conn) ~@body))
 
 (defn get-logs [id]
   (wcar* (car/get id)))
@@ -13,7 +16,7 @@
   (wcar* (car/set id (into (get-logs id) lines))))
 
 (defn wait-for-new-lines [id processor]
-  (car/with-new-pubsub-listener {}
+  (car/with-new-pubsub-listener (:spec (redis-server-conn))
     {id (fn [msg] (prn id msg) (if (= (first msg) "message") (processor (nth msg 2))))
      "*" (fn [msg] (prn id msg))}
     (car/subscribe id)

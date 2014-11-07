@@ -30,6 +30,8 @@
              ["-p" "--port" "Port to listen" :default 8080 :parse-fn to-int]
              ["--thread" "Http worker thread count" :default 4 :parse-fn to-int]
              ["--profile" "dev or prod" :default :dev :parse-fn keyword]
+             ["--redis-host" "Redis host" :default "127.0.0.1" :parse-fn str]
+             ["--redis-port" "Redis port" :default 6379 :parse-fn to-int]
              ["--[no-]help" "Print this help"])]
     (when (:help options) (println banner) (System/exit 0))
     ;; config can be accessed by (cfg :key)
