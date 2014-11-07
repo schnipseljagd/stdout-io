@@ -13,8 +13,10 @@
 
 (defn wait-for-new-lines [id processor]
   (car/with-new-pubsub-listener {}
-    {id (fn [msg] (processor (nth msg 2)))}
-    (car/subscribe id)))
+    {id (fn [msg] (prn id msg) (if (= (first msg) "message") (processor (nth msg 2))))
+     "*" (fn [msg] (prn id msg))}
+    (car/subscribe id)
+    (car/psubscribe "*")))
 
 (defn publish-new-lines [id newlines]
   (wcar* (car/publish id newlines)))
@@ -25,16 +27,25 @@
    :body (json/write-str data)})
 
 (defn get-logs-handler [req]
-  (let [id (-> req :params :id)]
+  (let [id (-> req :params :id)
+        new-lines (get-logs id)]
     (with-channel req channel
+    ;  (if (seq new-lines)
+    ;    (send! channel (json-ok new-lines)))
       (let [listener (wait-for-new-lines
                        id
-                       (fn [newlines]
-                         (send! channel (json-ok newlines))))]
-        (on-close channel (fn [status] (car/close-listener listener)))))))
+                       (fn [new-lines]
+                         (println "send " (apply str new-lines) " to " channel)
+                         (send! channel (json-ok new-lines))))]
+
+        (on-close channel (fn [status]
+                            (car/close-listener listener)
+                            (println "channel closed, " status)))
+        ))))
 
 (defn write-logs-handler [req]
   (let [id (-> req :params :id)
         newlines (json/read-str (slurp (-> req :body)))]
     (write-logs id newlines)
-    (publish-new-lines id newlines)))
+    (publish-new-lines id newlines))
+    "OK")
