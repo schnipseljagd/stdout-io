@@ -1,0 +1,10 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "Service",
+  "id": "stdout-io",
+  "port": 8080,
+  "containerPort": "http-server",
+  "selector": { "name": "stdout-io" },
+  "createExternalLoadBalancer": true
+}
+

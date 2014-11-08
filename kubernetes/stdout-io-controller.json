@@ -1,0 +1,26 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "ReplicationController",
+  "id": "stdout-io-controller",
+  "desiredState": {
+    "replicas": 3,
+    "replicaSelector": { "name": "stdout-io" },
+    "podTemplate": {
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "stdout-io-controller",
+          "containers": [{
+            "image": "schnipseljagd/stdout-io",
+            "name": "stdout-io",
+            "command": ["sh", "-c", "/usr/bin/java -jar /uberjar.jar --profile prod --redis-host $REDIS_MASTER_SERVICE_HOST --redis-port $REDIS_MASTER_SERVICE_PORT"],
+            "ports": [{ "name": "http-server", "containerPort": 8080 }]
+          }]
+        }
+      },
+      "labels": { "name": "stdout-io" }
+    }
+  },
+  "labels": { "name": "stdout-io" }
+}
+
