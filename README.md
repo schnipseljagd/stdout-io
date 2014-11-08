@@ -1,5 +1,6 @@
 # Project Name
 
+Currently running on http://130.211.91.62:8080/api/logs/ feel free to experiment.
 
 ## Development
 
