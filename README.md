@@ -21,6 +21,16 @@ curl -v localhost:8080/api/logs/test # fetch logs, connection will be closed aft
 curl -XPOST -H'Content-type: application/json' -d'["blaaah","blub"]' localhost:8080/api/logs/test
 ```
 
+## Setup local docker images
+
+```sh
+lein uberimage # build docker image with uberimage https://github.com/palletops/lein-uberimage
+
+docker run --name some-redis -d redis # start redis docker container https://registry.hub.docker.com/_/redis/
+
+# link the redis container and run the uberimage
+docker run -i -t --link some-redis:redis -p 8080:8080 <uberimage-id> /bin/bash -c '/usr/bin/java -jar /uberjar.jar --redis-host "$REDIS_PORT_6379_TCP_ADDR" --redis-port $REDIS_PORT_6379_TCP_PORT'
+```
 
 ## License
 
