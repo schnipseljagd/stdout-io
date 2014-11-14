@@ -14,7 +14,7 @@ service redis-server start # make sure redis is running and installed
 
 ```sh
 curl -XPOST -H'Content-type: application/json' -d'["foo","bar"]' localhost:8080/api/logs/test
-curl -v localhost:8080/api/logs/test # fetch logs, connection will be closed after 10 seconds
+curl -N -v localhost:8080/api/logs/test # fetch logs, connection will be closed after 10 seconds
 ```
 
 ```sh
